@@ -38,25 +38,65 @@ class Play extends Phaser.Scene{
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
     
-        // boom boom animation
+        //boom boom animation
         this.anims.create({
             key: 'explode',
             frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 9, first: 0}),
             frameRate: 30
         });
+
+        //bind score property to scene
+        this.p1Score = 0;
+
+        //display the score
+        let scoreConfig = {
+            fontFamily: 'Courier',
+            fontSize: '28px',
+            backgroundColor: '#F3B141',
+            color: '#843605',
+            align: 'right',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 100
+        }
+        this.scoreLeft = this.add.text(69, 54, this.p1Score, scoreConfig);
+    
+        //game over flag
+        this.gameOver = false;
+
+        //60 second play clock
+        scoreConfig.fixedWidth = 0;
+        this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
+            this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 64, '(F)ire to Restart or <- for Menu', scoreConfig).setOrigin(0.5);
+            this.gameOver = true;
+        }, null, this);
     }
 
     update(){
+        //check key input to restart
+        if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyF)) {
+            this.scene.restart(this.p1Score);
+        }
+
+        //return to menu
+        if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+            this.scene.start("menuScene");
+        }
+
         //scroll starBackground
         this.starBackground.tilePositionX -= 4;
 
-        //update the rocket
-        this.p1Rocket.update();
-
-        //update spaceships
-        this.ship01.update();
-        this.ship02.update();
-        this.ship03.update();
+        if(!this.gameOver){
+            //update the rocket
+            this.p1Rocket.update();
+            //update spaceships
+            this.ship01.update();
+            this.ship02.update();
+            this.ship03.update();
+        }
 
         //checking for collisions and reseting if true
         if(this.checkCollision(this.p1Rocket,this.ship03)){
@@ -88,13 +128,20 @@ class Play extends Phaser.Scene{
     shipExplode(ship) {
         //initially hides ship
         ship.alpha = 0;
-        // creates explosion sprite where ship is
+        //creates explosion sprite where ship is
         let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
         boom.anims.play('explode');     // plays boom boom animation
         boom.on('animationcomplete', () => {    // callsback after animation finishes
-            ship.reset();       // resets ship 
-            ship.alpha = 1;     // makes ship visible again
-            boom.destroy();     // removes explosion sprite
-        });       
+            ship.reset();       //resets ship 
+            ship.alpha = 1;     //makes ship visible again
+            boom.destroy();     //removes explosion sprite
+        });   
+        
+        //score increase and repaint
+        this.p1Score += ship.points;
+        this.scoreLeft.text = this.p1Score; 
+
+        //make ship explosion boom boom
+        this.sound.play('sfx_explosion');
     }
 }
