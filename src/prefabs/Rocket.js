@@ -28,10 +28,14 @@ class Rocket extends Phaser.GameObjects.Sprite{
             this.y -= 2;
         }
         
-        //rest on miss
+        //reset on miss
         if(this.y <= 108){
-            this.isFiring = false;
-            this.y = 431;
+            this.reset();
         }
+    }
+    //resets rocket to ground level
+    reset(){
+        this.isFiring = false;
+        this.y = 431;
     }
 }
