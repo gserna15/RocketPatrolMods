@@ -8,15 +8,19 @@ class Play extends Phaser.Scene{
         this.load.image('rocket','./assets/rocket.png');
         this.load.image('spaceship','./assets/spaceship.png');
         this.load.image('starBackground','./assets/starBackground.png');
+        this.load.image('starBackground2','./assets/starBackground2.png');
+        this.load.image('starBackground3','./assets/starBackground3.png');
         this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9});
     }
 
     create(){
 
-        //place tile sprite
+        //place layered tile sprites for parallax scrolling
         this.starBackground = this.add.tileSprite(0,0,640,480,'starBackground').setOrigin(0,0);
+        this.starBackground2 = this.add.tileSprite(0,0,640,480,'starBackground2').setOrigin(0,0);
+        this.starBackground3 = this.add.tileSprite(0,0,640,480,'starBackground3').setOrigin(0,0);
 
-        //white rectangle borders
+        //facade rectangle borders
         this.add.rectangle(5,5,630,32, 0xFACADE).setOrigin(0,0);
         this.add.rectangle(5,443,630,32, 0xFACADE).setOrigin(0,0);
         this.add.rectangle(5,5,32,455, 0xFACADE).setOrigin(0,0);
@@ -29,9 +33,11 @@ class Play extends Phaser.Scene{
         this.p1Rocket = new Rocket(this, game.config.width/2, 431, 'rocket');
 
         //add spaceships
-        this.ship01 = new Spaceship(this, game.config.width + 192, 132, 'spaceship', 0, 30).setOrigin(0,0);
-        this.ship02 = new Spaceship(this, game.config.width + 96, 196, 'spaceship', 0, 20).setOrigin(0,0);
-        this.ship03 = new Spaceship(this, game.config.width, 260, 'spaceship', 0, 10).setOrigin(0,0);
+        this.ship01 = new Spaceship(this, game.config.width + 288, 72, 'spaceship', 0, 40).setOrigin(0,0);
+        this.ship02 = new Spaceship(this, game.config.width + 192, 132, 'spaceship', 0, 30).setOrigin(0,0);
+        this.ship03 = new Spaceship(this, game.config.width + 96, 196, 'spaceship', 0, 20).setOrigin(0,0);
+        this.ship04 = new Spaceship(this, game.config.width, 260, 'spaceship', 0, 10).setOrigin(0,0);
+
 
         //defining the keyboard keys here
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
@@ -76,6 +82,15 @@ class Play extends Phaser.Scene{
     }
 
     update(){
+        //left and right movement with the mouse! move your mouse and the rocket will follow
+        if(!this.isFiring){
+            if(this.p1Rocket.x >= this.input.mousePointer.x){
+                this.p1Rocket.x -= 2;
+            }else if(this.p1Rocket.x <= this.input.mousePointer.x){
+                this.p1Rocket.x += 2;
+            }
+        }
+
         //check key input to restart
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyF)) {
             this.scene.restart(this.p1Score);
@@ -86,8 +101,10 @@ class Play extends Phaser.Scene{
             this.scene.start("menuScene");
         }
 
-        //scroll starBackground
-        this.starBackground.tilePositionX -= 4;
+        //scroll starBackgrounds for parallax scrolling!
+        this.starBackground.tilePositionX -= 1;
+        this.starBackground2.tilePositionX -= 2;
+        this.starBackground3.tilePositionX -= 3;
 
         if(!this.gameOver){
             //update the rocket
@@ -96,9 +113,14 @@ class Play extends Phaser.Scene{
             this.ship01.update();
             this.ship02.update();
             this.ship03.update();
+            this.ship04.update();
         }
 
         //checking for collisions and reseting if true
+        if(this.checkCollision(this.p1Rocket,this.ship04)){
+            this.p1Rocket.reset();
+            this.shipExplode(this.ship04);
+        }
         if(this.checkCollision(this.p1Rocket,this.ship03)){
             this.p1Rocket.reset();
             this.shipExplode(this.ship03);
