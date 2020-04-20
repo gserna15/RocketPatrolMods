@@ -1,3 +1,22 @@
+/*
+Gabrielle Serna 
+April 19, 2020
+
+Points Breakdown:
+1. Create a scrolling tile sprite for the background (10)
+2. Allow player to control the rocket after it's fired (10)
+3. Create a new title screen (15)
+4. Implement Parallax Scrolling (15)
+5. Create artwork for all in-game assets (25)
+6. Implement mouse control for player movement (20)      
+      *not 25 because you still use (F) to fire
+5. Add a fourth spaceship worth more points (5)      
+      * I tried to add the additional fourth and smaller spaceships that was worth more points, 
+      but only got so far as being able to add the spaceship and make it worth the most points...
+
+  Total: 100
+*/
+
 class Menu extends Phaser.Scene{
     constructor(){
         super("menuScene");
