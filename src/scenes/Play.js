@@ -83,6 +83,7 @@ class Play extends Phaser.Scene{
 
     update(){
         //left and right movement with the mouse! move your mouse and the rocket will follow
+        //Source used to figure out how to follow the mouse's position: https://stackoverflow.com/questions/28104605/how-to-find-the-mouse-position-x-y-using-phaser
         if(!this.isFiring){
             if(this.p1Rocket.x >= this.input.mousePointer.x){
                 this.p1Rocket.x -= 2;
